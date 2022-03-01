@@ -1,0 +1,5 @@
+1. W generatorze nie moge jeszcze dać 2 opcji(generowanie losowe usuwanie ale graf jest spójny) możliwe rozwiązania:
+-zapisać graf w pliku potem go odczytać i uzyć algorytmu BTS i jak trzeba to znowu wygenerowac graf i powtorzyć te kroki az do skutku
+teraz opcje ktore potrzebuja wprowadzenia struktur
+- po wygenerowaniu grafu ale przed jego zapisem uzywamy algorytmu bts i generujemy od nowa
+- po wygenerowaniu grafu ale przed jego zapisem uzywamy algorytmu bts i dodajemy laczenie w odpowiednim miejscu
