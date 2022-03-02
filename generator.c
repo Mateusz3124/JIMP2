@@ -149,6 +149,16 @@ int main(int argc, char **argv )
 	
 	}
 	
+	if(w <= 0)
+		printf("incorrect lines number");
+	if(k <= 0)
+		printf("incorrect colums number");
+	if(s < 0)
+		printf("incorrect lower limit");
+	if(e < 0)
+		printf("incorrect higher limit");
+	
+	
 	write(s,e,w,k,m,out1);
 	
 	return 0;
