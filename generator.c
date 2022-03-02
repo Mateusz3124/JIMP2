@@ -12,7 +12,7 @@ void write(double s, double e, int w, int k, int m, char *out1)
 
 	if (out == NULL) 
 	{
-      fprintf (stderr, "can not read file: %s\n\n",  out1);
+      fprintf (stderr, "can not write in file: %s\n\n",  out1);
       exit (EXIT_FAILURE);
 	}
 	  
