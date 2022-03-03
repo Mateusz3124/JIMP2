@@ -155,6 +155,8 @@ int main(int argc, char **argv )
 		printf("incorrect colums number");
 	if(s < 0 ||e < 0)
 		printf("incorrect lower limit or incorrect higher limit");
+	if(e<s)
+		printf("higher limit is too low");
 	
 	
 	write(s,e,w,k,m,out1);
