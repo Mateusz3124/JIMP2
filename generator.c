@@ -147,7 +147,7 @@ int main(int argc, char **argv )
         }
 		else if (!strcmp(x, "--columns")){
 			if (atoi(arguments[++i]) != 0 || arguments[i+1] == "0") 
-			    rows = atoi(arguments[i]);
+			    columns = atoi(arguments[i]);
             else
                 bad_input = 1;
         }
