@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include <time.h>  
-#include <getopt.h>
+#include <string.h>
 
 void write(double s, double e, int w, int k, int m, char *out1)
 {
@@ -46,7 +46,6 @@ void write(double s, double e, int w, int k, int m, char *out1)
 				g++;
 		}
 
-		
 		f = (double)rand() / RAND_MAX;
 		
 		if(i != 0 ) // po lewej
@@ -59,14 +58,13 @@ void write(double s, double e, int w, int k, int m, char *out1)
 			else 
 				temp2++;
 		}
-				
+		
 		f = (double)rand() / RAND_MAX;
 		
 		if (m !=1)
 		{
 			double temp = (double)rand() / RAND_MAX;
 		}
-		
 		if(i !=k-1) // po prawej
 		{
 			if (temp <= 0.8)
@@ -85,7 +83,6 @@ void write(double s, double e, int w, int k, int m, char *out1)
 		{
 			temp = (double)rand() / RAND_MAX;
 		}
-		
 		if(t !=w) // na dole
 		{
 			if (temp <= 0.8)
@@ -96,70 +93,130 @@ void write(double s, double e, int w, int k, int m, char *out1)
 			else
 				temp3[g2++]=l+k;
 		}
-
 		fprintf(out,"\n"); // koniec lini(wszystkie polaczenia do danego puntu zostaly juz zapisane)
 		l++;
 	}
-	
 	t++;
-	
 	}
 	free(temp3);
 }
 
 int main(int argc, char **argv )
 {
-	
-	double s =0.0;
-	double e =1.0;
-	int w = 7;
-	int k =4;
-	int m = 1; // zawsze sa polaczenia
+	double min_weight = 0.0;
+	double max_weight = 1.0;
+	int rows = 1;
+	int columns = 1;
+	int m = 1; // 1 all, 2 connected, 3 random 
 	char *out1 = "text";
-	int opt;
+    int check_connection = 0; // czy odpalac BFSa
+    int edges = 1; // metoda tworzenia krawedzi
+    int npaths = 0; // liczba siciezek ktore trza znalezc
+    int *paths; // tablic przehowujaca poczatki i konce sciezek ktore trzeba znalezc w formacie pocz1 kon1 pocz2 ...
 	
-	while ((opt = getopt (argc, argv, "w:k:s:e:o:m:")) != -1) 
-	{
-		
-	switch (opt) 
-	{
-	case 'o':
-	out1= optarg; // gdzie zapisywac automatycznie do pliku text
-	break;
-	case 's':
-	s= atoi(optarg);// dolny limit wagi
-	break;
-	case 'e':
-	e= atoi(optarg); // gorny limit wagi
-	break;
-	case 'w':
-	w = atoi(optarg); // liczba wierszy
-	break;
-	case 'k':
-	k = atoi(optarg);  // liczba kolumn
-	break;
-	case 'm':
-	m = atoi(optarg); //
-	break;
-	
-	default:                   
-      fprintf (stderr, "bad input");
-      exit (EXIT_FAILURE);
+	char **arguments = malloc((argc+1)*sizeof(char[10])); // przepisujemy argv do innej listy
+	for (int i=0; i<argc; i++)
+        arguments[i] = argv[i];
+    arguments[argc] = "END"; // wstawiamy znacznik konca listy argumentow
+
+    int i = 1; // zmienna do iterowania po argumentach
+    int bad_input = 0; // sprawdzamy na koncu petli
+	while (i < argc) { 
+		char *x = arguments[i];
+
+		if (!strcmp(x, "--output"))
+            out1 = arguments[++i];
+        
+		else if (!strcmp(x, "--min-weight")){
+            if (atof(arguments[++i]) != 0 || arguments[i+1] == "0") 
+			    min_weight = atof(arguments[i]);
+            else
+                bad_input = 1;
+        }
+		else if (!strcmp(x, "--max-weight")){
+			if (atof(arguments[++i]) != 0 || arguments[i+1] == "0") 
+			    max_weight = atof(arguments[i]);
+            else
+                bad_input = 1;
+        }
+		else if (!strcmp(x, "--rows")){
+			if (atoi(arguments[++i]) != 0 || arguments[i+1] == "0") 
+			    rows = atoi(arguments[i]);
+            else
+                bad_input = 1;
+        }
+		else if (!strcmp(x, "--columns")){
+			if (atoi(arguments[++i]) != 0 || arguments[i+1] == "0") 
+			    rows = atoi(arguments[i]);
+            else
+                bad_input = 1;
+        }
+        else if (!strcmp(x, "--check-connection"))
+			check_connection = 1;
+
+		else if (!strcmp(x, "--path")){ // sciezki do znalezienia --path liczba_sciezek poczatek1 koniec1 poczatek2 ..
+			if (atoi(arguments[++i]) <= 0){
+                fprintf(stderr, "incorrect input\n"); // tutaj zamiast bad_input ubijamy program odrazu bo bylby blad
+	        	exit (EXIT_FAILURE);
+	        }
+            npaths = atoi(arguments[i]);
+            paths = malloc(2*npaths*sizeof(int)); // trzeba pamietac zeby free() potem zrobic 
+            for (int j=0; j<2*npaths; j++){
+                if (atoi(arguments[i+1]) != 0 || arguments[i+1] == "0") 
+                    paths[j] = atoi(arguments[++i]);
+                else {
+                    fprintf (stderr, "incorrect input\n");
+			        exit (EXIT_FAILURE);
+                }
+            }
+        }
+    	else if (!strcmp(x, "--edges")){
+            char *y = arguments[++i];
+			if (!strcmp(y, "all"))
+				edges = 1;
+			else if (!strcmp(y, "connected"))
+				edges = 2;
+			else if (!strcmp(y, "random"))
+				edges = 3;
+			else 
+                bad_input = 1;
+        }
+		else 
+			bad_input = 1;
+        
+        if (bad_input == 1){
+            fprintf (stderr, "incorrect input\n");
+			exit (EXIT_FAILURE);
+        }
+		i++;
 	}
-	
+    free(arguments);
+	if(rows <= 0){
+		fprintf(stderr, "incorrect lines number\n");
+		exit (EXIT_FAILURE);
 	}
-	
-	if(w <= 0)
-		printf("incorrect lines number");
-	if(k <= 0)
-		printf("incorrect colums number");
-	if(s < 0 ||e < 0)
-		printf("incorrect lower limit or incorrect higher limit");
-	if(e<s)
-		printf("higher limit is too low");
-	
-	
-	write(s,e,w,k,m,out1);
-	
+	if(columns <= 0){
+		fprintf(stderr, "incorrect colums number\n");
+		exit (EXIT_FAILURE);
+	}
+	if(min_weight < 0 || max_weight < 0){
+		fprintf(stderr, "incorrect lower limit or incorrect higher limit\n");
+		exit (EXIT_FAILURE);
+	}
+	if(max_weight < min_weight){
+		fprintf(stderr, "higher limit is too low\n");
+		exit (EXIT_FAILURE);
+	}
+
+    printf("rows: %d, columns: %d\n", rows, columns); // TEST
+	printf("edge mode: %d\n", edges);
+    printf("Paths: ");
+    for (int i=0; i<2*npaths; i++)
+        printf("%d ", paths[i]);
+    printf("\n");
+    printf("min_weight: %f, max_weight: %f\n", min_weight, max_weight);
+    printf("output file name: %s\n", out1); // KONIEC TESTU
+
+	write(min_weight,max_weight,rows,columns,edges,out1);
 	return 0;
 }

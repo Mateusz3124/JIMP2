@@ -3,3 +3,5 @@
 teraz opcje ktore potrzebuja wprowadzenia struktur
 - po wygenerowaniu grafu ale przed jego zapisem uzywamy algorytmu bts i generujemy od nowa
 - po wygenerowaniu grafu ale przed jego zapisem uzywamy algorytmu bts i dodajemy laczenie w odpowiednim miejscu
+
+2. Zrobić obsługę błędów alokacji pamięci
