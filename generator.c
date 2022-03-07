@@ -3,16 +3,16 @@
 #include <time.h>  
 #include <string.h>
 
-void write(double s, double e, int w, int k, int m, char *out1)
+void write(double s, double e, int w, int k, int m, char *output)
 {
 	int t =1; // symbolizuje obecny wiersz
 	int l =0; // obecny punkt w ktorym sie znajdujemy
 	
-	FILE *out = fopen(out1,"w");
+	FILE *out = fopen(output,"w");
 
 	if (out == NULL) 
 	{
-      fprintf (stderr, "can not write in file: %s\n\n",  out1);
+      fprintf (stderr, "can not write in file: %s\n\n",  output);
       exit (EXIT_FAILURE);
 	}
 	  
@@ -108,7 +108,8 @@ int main(int argc, char **argv )
 	int rows = 1;
 	int columns = 1;
 	int m = 1; // 1 all, 2 connected, 3 random 
-	char *out1 = "text";
+	char *output = "text";
+	char *input = "text";
     int check_connection = 0; // czy odpalac BFSa
     int edges = 1; // metoda tworzenia krawedzi
     int npaths = 0; // liczba siciezek ktore trza znalezc
@@ -125,28 +126,31 @@ int main(int argc, char **argv )
 		char *x = arguments[i];
 
 		if (!strcmp(x, "--output"))
-            out1 = arguments[++i];
+            output = arguments[++i];
+
+		else if (!strcmp(x, "--input"))
+            input = arguments[++i];
         
 		else if (!strcmp(x, "--min-weight")){
-            if (atof(arguments[++i]) != 0 || arguments[i+1] == "0") 
+            if (atof(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
 			    min_weight = atof(arguments[i]);
             else
                 bad_input = 1;
         }
 		else if (!strcmp(x, "--max-weight")){
-			if (atof(arguments[++i]) != 0 || arguments[i+1] == "0") 
+			if (atof(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
 			    max_weight = atof(arguments[i]);
             else
                 bad_input = 1;
         }
 		else if (!strcmp(x, "--rows")){
-			if (atoi(arguments[++i]) != 0 || arguments[i+1] == "0") 
+			if (atoi(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
 			    rows = atoi(arguments[i]);
             else
                 bad_input = 1;
         }
 		else if (!strcmp(x, "--columns")){
-			if (atoi(arguments[++i]) != 0 || arguments[i+1] == "0") 
+			if (atoi(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
 			    columns = atoi(arguments[i]);
             else
                 bad_input = 1;
@@ -162,7 +166,7 @@ int main(int argc, char **argv )
             npaths = atoi(arguments[i]);
             paths = malloc(2*npaths*sizeof(int)); // trzeba pamietac zeby free() potem zrobic 
             for (int j=0; j<2*npaths; j++){
-                if (atoi(arguments[i+1]) != 0 || arguments[i+1] == "0") 
+                if (atoi(arguments[i+1]) > 0 || !(strcmp(arguments[i+1], "0"))) 
                     paths[j] = atoi(arguments[++i]);
                 else {
                     fprintf (stderr, "incorrect input\n");
@@ -210,13 +214,15 @@ int main(int argc, char **argv )
 
     printf("rows: %d, columns: %d\n", rows, columns); // TEST
 	printf("edge mode: %d\n", edges);
-    printf("Paths: ");
+    printf("paths: ");
     for (int i=0; i<2*npaths; i++)
         printf("%d ", paths[i]);
     printf("\n");
+	printf("check connection: %d\n" ,check_connection);
     printf("min_weight: %f, max_weight: %f\n", min_weight, max_weight);
-    printf("output file name: %s\n", out1); // KONIEC TESTU
+    printf("output file name: %s\n", output); 
+	printf("input file name: %s\n", input); // KONIEC TESTU
 
-	write(min_weight,max_weight,rows,columns,edges,out1);
+	write(min_weight,max_weight,rows,columns,edges,output);
 	return 0;
 }
