@@ -158,6 +158,8 @@ void reader(char*out1)
 		head = temp;
 	}
 	fclose(out);
+	free(nconnected);
+	free(nweight);	
 }
 
 int main(int argc, char **argv )
