@@ -44,6 +44,7 @@ void write(double s, double e, int w, int k, int m, char *out1)
 		
 	for(int i=0;i<k; i++)
 	{	
+		fprintf(out,"	");
 
 		double f = (double)rand() / RAND_MAX;
 		
@@ -147,7 +148,7 @@ void reader(char*out1)
 		}
 		p = buf;
 		i=0;
-		sscanf(p,"%i :%lf %i :%lf %i :%lf %i :%lf",&(nconnected[i]),&(nweight[i]), &(nconnected[i+1]),&(nweight[i+1]) ,&(nconnected[i+2]),&(nweight[i+2]), &(nconnected[i+3]),&(nweight[i+3]));
+		sscanf(p,"	%i :%lf %i :%lf %i :%lf %i :%lf",&(nconnected[i]),&(nweight[i]), &(nconnected[i+1]),&(nweight[i+1]) ,&(nconnected[i+2]),&(nweight[i+2]), &(nconnected[i+3]),&(nweight[i+3]));
 		Node* temp=(Node*)malloc(sizeof(Node));
 		temp->connected = malloc(sizeof(int) * 5);
 		temp->weight = malloc(sizeof(double) * 5);
