@@ -256,7 +256,7 @@ int main(int argc, char **argv )
 	}
     free(arguments);
 	if(rows <= 0){
-		fprintf(stderr, "incorrect lines number\n");
+		fprintf(stderr, "incorrect rows number\n");
 		exit (EXIT_FAILURE);
 	}
 	if(columns <= 0){
