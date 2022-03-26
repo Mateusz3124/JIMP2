@@ -213,7 +213,10 @@ void write(double s, double e, int w, int k, int m, char *out1)
 	if (m ==2)
 	{
 		if(bfs(headw,k ,w)==1)  
+		{
+		fclose(out);
 		write(s,  e, w, k, m, out1);
+		}
 	}
 	
 	free(headw);
