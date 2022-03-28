@@ -1,228 +1,88 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>  
 #include <string.h>
 
-void write(double s, double e, int w, int k, int m, char *output)
+typedef struct Node // docelowo strukura w meinie
 {
-	int t =1; // symbolizuje obecny wiersz
-	int l =0; // obecny punkt w ktorym sie znajdujemy
-	
-	FILE *out = fopen(output,"w");
+  int *connected;
+  double *weight;
+}Node;
 
-	if (out == NULL) 
-	{
-      fprintf (stderr, "can not write in file: %s\n\n",  output);
-      exit (EXIT_FAILURE);
-	}
-	  
-	srand(time(NULL));
-	
-	fprintf(out, "%d %d\n", w, k);
-	
-	double temp =0.0;
-
-	int temp2 = 0;
-	int *temp3 = malloc(w*k*sizeof(temp3));
-	int g = 0;
-	int g2 =0;
-	
-	for(int h=0;h<w;h++)
-	{
-		
-	for(int i=0;i<k; i++)
-	{	
-
-		double f = (double)rand() / RAND_MAX;
-		
-		if(t !=1) //na gorze
-		{
-			if(temp3[g] !=l)
-			{
-			fprintf(out,"%d ",l-k);
-			fprintf(out,":%f  ",s+(e-s)*f);
-			}
-			else
-				g++;
-		}
-
-		f = (double)rand() / RAND_MAX;
-		
-		if(i != 0 ) // po lewej
-		{
-			if (temp2 == 0)
-			{
-			fprintf(out,"%d ",l-1);
-			fprintf(out,":%f  ",s+(e-s)*f);
-			}
-			else 
-				temp2++;
-		}
-		
-		f = (double)rand() / RAND_MAX;
-		
-		if (m !=1)
-		{
-			double temp = (double)rand() / RAND_MAX;
-		}
-		if(i !=k-1) // po prawej
-		{
-			if (temp <= 0.8)
-			{
-			fprintf(out,"%d ",l+1);
-			fprintf(out,":%f  ",s+(e-s)*f);
-			}
-			else
-				temp2=-1;
-		}
-			
-		
-		f = (double)rand() / RAND_MAX;
-		
-		if (m !=1)
-		{
-			temp = (double)rand() / RAND_MAX;
-		}
-		if(t !=w) // na dole
-		{
-			if (temp <= 0.8)
-			{
-			fprintf(out,"%d ",l+k);
-			fprintf(out,":%f  ",s+(e-s)*f);
-			}
-			else
-				temp3[g2++]=l+k;
-		}
-		fprintf(out,"\n"); // koniec lini(wszystkie polaczenia do danego puntu zostaly juz zapisane)
-		l++;
-	}
-	t++;
-	}
-	free(temp3);
+double get_random_number(double min_weight, double max_weight){
+	double r = (double)rand() / RAND_MAX;
+	return(min_weight + (max_weight - min_weight)*r);
 }
 
-int main(int argc, char **argv )
-{
-	double min_weight = 0.0;
-	double max_weight = 1.0;
-	int rows = 1;
-	int columns = 1;
-	int m = 1; // 1 all, 2 connected, 3 random 
-	char *output = "text";
-	char *input = "text";
-    int check_connection = 0; // czy odpalac BFSa
-    int edges = 1; // metoda tworzenia krawedzi
-    int npaths = 0; // liczba siciezek ktore trza znalezc
-    int *paths; // tablic przehowujaca poczatki i konce sciezek ktore trzeba znalezc w formacie pocz1 kon1 pocz2 ...
-	
-	char **arguments = malloc((argc+1)*sizeof(char[10])); // przepisujemy argv do innej listy
-	for (int i=0; i<argc; i++)
-        arguments[i] = argv[i];
-    arguments[argc] = "END"; // wstawiamy znacznik konca listy argumentow
-
-    int i = 1; // zmienna do iterowania po argumentach
-    int bad_input = 0; // sprawdzamy na koncu petli
-	while (i < argc) { 
-		char *x = arguments[i];
-
-		if (!strcmp(x, "--output"))
-            output = arguments[++i];
-
-		else if (!strcmp(x, "--input"))
-            input = arguments[++i];
-        
-		else if (!strcmp(x, "--min-weight")){
-            if (atof(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
-			    min_weight = atof(arguments[i]);
-            else
-                bad_input = 1;
-        }
-		else if (!strcmp(x, "--max-weight")){
-			if (atof(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
-			    max_weight = atof(arguments[i]);
-            else
-                bad_input = 1;
-        }
-		else if (!strcmp(x, "--rows")){
-			if (atoi(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
-			    rows = atoi(arguments[i]);
-            else
-                bad_input = 1;
-        }
-		else if (!strcmp(x, "--columns")){
-			if (atoi(arguments[++i]) != 0 || !(strcmp(arguments[i+1], "0"))) 
-			    columns = atoi(arguments[i]);
-            else
-                bad_input = 1;
-        }
-        else if (!strcmp(x, "--check-connection"))
-			check_connection = 1;
-
-		else if (!strcmp(x, "--path")){ // sciezki do znalezienia --path liczba_sciezek poczatek1 koniec1 poczatek2 ..
-			if (atoi(arguments[++i]) <= 0){
-                fprintf(stderr, "incorrect input\n"); // tutaj zamiast bad_input ubijamy program odrazu bo bylby blad
-	        	exit (EXIT_FAILURE);
-	        }
-            npaths = atoi(arguments[i]);
-            paths = malloc(2*npaths*sizeof(int)); // trzeba pamietac zeby free() potem zrobic 
-            for (int j=0; j<2*npaths; j++){
-                if (atoi(arguments[i+1]) > 0 || !(strcmp(arguments[i+1], "0"))) 
-                    paths[j] = atoi(arguments[++i]);
-                else {
-                    fprintf (stderr, "incorrect input\n");
-			        exit (EXIT_FAILURE);
-                }
-            }
-        }
-    	else if (!strcmp(x, "--edges")){
-            char *y = arguments[++i];
-			if (!strcmp(y, "all"))
-				edges = 1;
-			else if (!strcmp(y, "connected"))
-				edges = 2;
-			else if (!strcmp(y, "random"))
-				edges = 3;
-			else 
-                bad_input = 1;
-        }
-		else 
-			bad_input = 1;
-        
-        if (bad_input == 1){
-            fprintf (stderr, "incorrect input\n");
-			exit (EXIT_FAILURE);
-        }
-		i++;
+int edge_exists(int edge_mode){
+	double existance_chance = 0.7;		// prawdopodobienstwo istnienia krawedzi
+	if(edge_mode == 0){			// wszystkie krawedzie istnieja
+		return 0;
 	}
-    free(arguments);
-	if(rows <= 0){
-		fprintf(stderr, "incorrect lines number\n");
-		exit (EXIT_FAILURE);
+	if(get_random_number(0.0, 1.0) >= (1.0 - existance_chance)){
+		return 0;
+	}else{
+		return 1;
 	}
-	if(columns <= 0){
-		fprintf(stderr, "incorrect colums number\n");
-		exit (EXIT_FAILURE);
-	}
-	if(min_weight < 0 || max_weight < 0){
-		fprintf(stderr, "incorrect lower limit or incorrect higher limit\n");
-		exit (EXIT_FAILURE);
-	}
-	if(max_weight < min_weight){
-		fprintf(stderr, "higher limit is too low\n");
-		exit (EXIT_FAILURE);
-	}
+}
 
-    printf("rows: %d, columns: %d\n", rows, columns); // TEST
-	printf("edge mode: %d\n", edges);
-    printf("paths: ");
-    for (int i=0; i<2*npaths; i++)
-        printf("%d ", paths[i]);
-    printf("\n");
-	printf("check connection: %d\n" ,check_connection);
-    printf("min_weight: %f, max_weight: %f\n", min_weight, max_weight);
-    printf("output file name: %s\n", output); 
-	printf("input file name: %s\n", input); // KONIEC TESTU
+Node* generate(int max_weight, int min_weight, int columns, int rows, int edges){
+	Node* graph = malloc(columns*rows*sizeof *graph);
+	srand(time(NULL));
+	int n = 0; 	// numer rozpatrywanego wierzcholka
+	for(int r=0; r<rows; r++){
+		for(int c=0; c<columns; c++){
+			graph[n].connected = malloc(sizeof(int *)*4);
+			graph[n].weight = malloc(sizeof(int *)*4);
+			for(int i=0; i<4; i++){		//wypelnaimy wszystko -1 bo czemu nie
+				graph[n].connected[i] = -1;
+				graph[n].weight[i] = -1.0;
+			} 
+			if(r != 0 && edge_exists(edges) == 0){ 		// nie na gorze i istnieje krawedz
+				graph[n].connected[0] = n-columns;
+				graph[n].weight[0] = get_random_number(min_weight, max_weight); 
+			}
+			if(c != 0 && edge_exists(edges) == 0){   // nie po lewej
+				graph[n].connected[1] = n-1;
+				graph[n].weight[1] = get_random_number(min_weight, max_weight); 
+			}
+			if(c != columns-1 && edge_exists(edges) == 0){   // nie po prawej
+				graph[n].connected[2] = n+1;
+				graph[n].weight[2] = get_random_number(min_weight, max_weight); 
+			}
+			if(r != rows-1 && edge_exists(edges) == 0){   // nie na dole
+				graph[n].connected[3] = n+columns;
+				graph[n].weight[3] = get_random_number(min_weight, max_weight); 
+			}
+		n++;
+		}
+	}
+	return graph;
+}
 
-	write(min_weight,max_weight,rows,columns,edges,output);
+void write(int columns, int rows, struct Node *graph, char *output){
+	FILE *out = fopen(output,"w");
+	if (out == NULL) 
+	{
+      fprintf (stderr, "can not write in file: %s\n",  output);
+      exit (EXIT_FAILURE);
+	}
+	fprintf(out, "%d %d\n", rows, columns);
+	for(int n=0; n<rows*columns; n++){
+		for(int i=0; i<4; i++){
+			if(graph[n].connected[i]>=0){ 	// jesli -1 to nie ma polaczenia
+				fprintf(out, "%d ", graph[n].connected[i]);
+				fprintf(out, ":%f  ", graph[n].weight[i]);
+			}
+		}
+		fprintf(out, "\n");
+	}
+}
+
+int main(){ // Szybki test modulu
+	int	rows = 5;
+	int columns = 5;
+	Node *graph = generate(1, 0, columns, rows, 0);
+	write(columns, rows, graph, "XDtestmoduługeneratorXD");
 	return 0;
 }
