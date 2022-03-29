@@ -1,165 +1,85 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>  
-#include <getopt.h>
+#include <string.h>
+#include "generator.h"
+#include "bfs.h"
 
-void write(double s, double e, int w, int k, int m, char *out1)
-{
-	int t =1; // symbolizuje obecny wiersz
-	int l =0; // obecny punkt w ktorym sie znajdujemy
-	
-	FILE *out = fopen(out1,"w");
+double get_random_number(double min_weight, double max_weight){
+	double r = (double)rand() / RAND_MAX;
+	return(min_weight + (max_weight - min_weight)*r);
+}
 
+int edge_exists(int edge_mode){
+	double existance_chance = 0.1;		// prawdopodobienstwo istnienia krawedzi
+	if(edge_mode == 0){			// wszystkie krawedzie istnieja
+		return 0;
+	}
+	if(get_random_number(0.0, 1.0) >= (1.0 - existance_chance)){
+		return 0;
+	}else{
+		return 1;
+	}
+}
+
+Node* generate(int max_weight, int min_weight, int columns, int rows, int edges){
+	Node* graph = malloc(columns*rows*sizeof *graph);
+	srand(time(NULL));
+	int n = 0; 	// numer rozpatrywanego wierzcholka
+	int p;
+	for(int r=0; r<rows; r++){
+		for(int c=0; c<columns; c++){
+			graph[n].connected = malloc(sizeof(int *)*5);
+			graph[n].weight = malloc(sizeof(int *)*5);
+			for(int i=0; i<5; i++){		//wypelnaimy wszystko -1 bo czemu nie
+				graph[n].connected[i] = -1;
+				graph[n].weight[i] = -1.0;
+			} 
+			p = 0;
+			if(r != 0 && edge_exists(edges) == 0){ 		// nie na gorze i istnieje krawedz
+				graph[n].connected[p] = n-columns;
+				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
+			}
+			if(c != 0 && edge_exists(edges) == 0){   // nie po lewej
+				graph[n].connected[p] = n-1;
+				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
+			}
+			if(c != columns-1 && edge_exists(edges) == 0){   // nie po prawej
+				graph[n].connected[p] = n+1;
+				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
+			}
+			if(r != rows-1 && edge_exists(edges) == 0){   // nie na dole
+				graph[n].connected[p] = n+columns;
+				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
+			}
+		n++;
+		}
+	}
+	if(edges == 1 && bfs(graph, columns, rows)==1)  
+		{
+		free(graph);
+		generate(max_weight, min_weight, columns, rows, edges);
+		}
+	return graph;
+}
+
+void write(int columns, int rows, struct Node *graph, char *output){
+	FILE *out = fopen(output,"w");
 	if (out == NULL) 
 	{
-      fprintf (stderr, "can not write in file: %s\n\n",  out1);
+      fprintf (stderr, "can not write in file: %s\n",  output);
       exit (EXIT_FAILURE);
 	}
-	  
-	srand(time(NULL));
-	
-	fprintf(out, "%d %d\n", w, k);
-	
-	double temp =0.0;
-
-	int temp2 = 0;
-	int *temp3 = malloc(w*k*sizeof(temp3));
-	int g = 0;
-	int g2 =0;
-	
-	for(int h=0;h<w;h++)
-	{
-		
-	for(int i=0;i<k; i++)
-	{	
-
-		double f = (double)rand() / RAND_MAX;
-		
-		if(t !=1) //na gorze
-		{
-			if(temp3[g] !=l)
-			{
-			fprintf(out,"%d ",l-k);
-			fprintf(out,":%f  ",s+(e-s)*f);
+	fprintf(out, "%d %d\n", rows, columns);
+	for(int n=0; n<rows*columns; n++){
+		for(int i=0; i<4; i++){
+			if(graph[n].connected[i]>=0){ 	// jesli -1 to nie ma polaczenia
+				fprintf(out, "%d ", graph[n].connected[i]);
+				fprintf(out, ":%f  ", graph[n].weight[i]);
 			}
-			else
-				g++;
 		}
-
-		
-		f = (double)rand() / RAND_MAX;
-		
-		if(i != 0 ) // po lewej
-		{
-			if (temp2 == 0)
-			{
-			fprintf(out,"%d ",l-1);
-			fprintf(out,":%f  ",s+(e-s)*f);
-			}
-			else 
-				temp2++;
-		}
-				
-		f = (double)rand() / RAND_MAX;
-		
-		if (m !=1)
-		{
-			double temp = (double)rand() / RAND_MAX;
-		}
-		
-		if(i !=k-1) // po prawej
-		{
-			if (temp <= 0.8)
-			{
-			fprintf(out,"%d ",l+1);
-			fprintf(out,":%f  ",s+(e-s)*f);
-			}
-			else
-				temp2=-1;
-		}
-			
-		
-		f = (double)rand() / RAND_MAX;
-		
-		if (m !=1)
-		{
-			temp = (double)rand() / RAND_MAX;
-		}
-		
-		if(t !=w) // na dole
-		{
-			if (temp <= 0.8)
-			{
-			fprintf(out,"%d ",l+k);
-			fprintf(out,":%f  ",s+(e-s)*f);
-			}
-			else
-				temp3[g2++]=l+k;
-		}
-
-		fprintf(out,"\n"); // koniec lini(wszystkie polaczenia do danego puntu zostaly juz zapisane)
-		l++;
+		fprintf(out, "\n");
 	}
-	
-	t++;
-	
-	}
-	free(temp3);
+	fclose(out);
 }
 
-int main(int argc, char **argv )
-{
-	
-	double s =0.0;
-	double e =1.0;
-	int w = 7;
-	int k =4;
-	int m = 1; // zawsze sa polaczenia
-	char *out1 = "text";
-	int opt;
-	
-	while ((opt = getopt (argc, argv, "w:k:s:e:o:m:")) != -1) 
-	{
-		
-	switch (opt) 
-	{
-	case 'o':
-	out1= optarg; // gdzie zapisywac automatycznie do pliku text
-	break;
-	case 's':
-	s= atoi(optarg);// dolny limit wagi
-	break;
-	case 'e':
-	e= atoi(optarg); // gorny limit wagi
-	break;
-	case 'w':
-	w = atoi(optarg); // liczba wierszy
-	break;
-	case 'k':
-	k = atoi(optarg);  // liczba kolumn
-	break;
-	case 'm':
-	m = atoi(optarg); //
-	break;
-	
-	default:                   
-      fprintf (stderr, "bad input");
-      exit (EXIT_FAILURE);
-	}
-	
-	}
-	
-	if(w <= 0)
-		printf("incorrect lines number");
-	if(k <= 0)
-		printf("incorrect colums number");
-	if(s < 0 ||e < 0)
-		printf("incorrect lower limit or incorrect higher limit");
-	if(e<s)
-		printf("higher limit is too low");
-	
-	
-	write(s,e,w,k,m,out1);
-	
-	return 0;
-}
