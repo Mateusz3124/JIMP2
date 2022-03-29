@@ -1,0 +1,126 @@
+\documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
+\begin{document}
+
+\title{Specyfikacja funkcjonalna programu operującego na grafach: \texttt{pong}}
+\author{Mateusz Sobol \and Jan Stachurski}
+\date{10.03.2022}
+\maketitle
+\renewcommand{\contentsname}{Spis treści}
+\tableofcontents
+\cleardoublepage
+\section{Cel projektu}\label{header-n231}
+
+Program pong potrafi dokonywać wielu operacji na grafach. Użytkownik może za jego pomocą:
+\begin{itemize}
+\item
+wygenerować graf, który potem jest zapisywany do pliku
+\item
+odczytać graf z pliku
+\item
+określić czy graf jest spójny
+\item
+odnaleźć najkrótsze ścieżki pomiędzy wybranymi węzłami
+\end{itemize}
+Program działa w trybie wsadowym. W programie zaimplementowano 3 sposoby generacji grafów czyli zawsze są krawędzie, istnienie krawędzi jest losowe, ale graf jest spójny, istnienie krawędzi jest kompletnie losowe
+
+
+\section{Opis funkcji udostępnianych przez program }\label{header-n233}
+
+Następujące funkcje programu:
+\begin{itemize}
+\item
+program generuje graf i zapisuje go do pliku wybranego przez użytkownika(jeżeli wybrany plik już istnieje zostanie on nadpisany, a jeżeli nie, to zostanie on stworzony). Graf będzie zależał od podanych przez użytkownika parametrów. Jeżeli jakiś parametr nie został podany będą wykorzystane wcześniej dobrane dane
+\item
+program odczytuje graf z pliku  
+\end{itemize}
+Jedna z powyższych funkcji musi być wykorzystana, aby działały poniższe funkcje 
+\begin{itemize}
+\item
+program za pomocą algorytmu BFS jest w stanie stwierdzić czy dany graf jest spójny czy nie
+\item
+program za pomocą algorytmu Dijkstry odnajduje najkrótszą ścieżkę pomiędzy podanymi przez użytkownika węzłami
+\end{itemize}
+
+\section{Struktura pliku do odczytu}\label{header-n256}
+Struktura jaką ma mieć plik: \\
+w pierwszej linijce znajduje się informacja najpierw o liczbie wierszy potem\\ o liczbie kolumn.
+Każda następna linnia reprezentuje połączenia kolejnych węzłów z innymi w formacie numer węzła :waga połączenia.\\
+\\
+Przykład\\
+\\
+2 2\\
+1 :0.475532  2 :0.204188  \\
+0 :0.108786  3 :0.677239  \\
+0 :0.957512  3 :0.330019  \\
+1 :0.060697  2 :0.893040  \\
+
+\section{Struktura pliku generowanego
+}\label{header-n279}
+Struktura pliku, w którym znajduje się wygenerowany graf ma strukturę analogiczną do struktury pliku do odczytu\\
+\\
+Przykład\\
+\\
+\\
+2 3\\
+1 :0.856050  3 :0.953041  \\
+0 :0.733579  2 :0.443786  4 :0.240165  \\
+1 :0.254257  5 :0.959854  \\
+0 :0.497184  4 :0.751724  \\
+1 :0.247386  3 :0.589294  5 :0.579818  \\
+2 :0.605548  4 :0.930297  \\
+
+
+\section{Argumenty wywołania programu
+}\label{header-n281}
+
+Program pong akceptuje następujące argumenty wywołania (po minusie zapisujemy odpowiednią flagę a potem po spacji daną)\\
+\texttt{-s} wartość 1-> oznacza że chcemy wygenerować graf i go zapisać do pliku, 2-> że chcemy odczytać graf, domyślnie jest 1
+\begin{itemize}
+\item
+argumenty potrzebne do odczytania grafu:
+\texttt{-i} nazwa pliku z którego odczytujemy graf, jeżeli nie istnieje pojawia się błąd\\
+\item
+argumenty potrzebne do wygenerowania grafu:
+\end{itemize}
+\texttt{---output} nazwa pliku do którego będzie zapisany graf domyślnie “text”\\
+\texttt{---max-weight} górny limit wagi losowanych krawędzi, domyślnie 1, nie może być mniejsze od 0\\
+\texttt{---min-weight} dolny limit wagi losowanych krawędzi, domyślnie 0, nie może być mniejsze od 0\\
+\texttt{---rows} liczba wierszy, domyślnie 0, dodatnia liczba naturalna\\
+\texttt{---colums} liczba kolumn, domyślnie 0, dodatnia liczba naturalna\\
+\texttt{---edges} all|connected|random metoda losowania wagi krawędzi: all tworzy wszytskie krawędzie, connected losuje krawędzie ale tak aby graf był spójny, a random losuje krawędzie nie uwzględniając spójności grafu. domyślnie all. \\
+\texttt{---check-connection}  oznacza że chcemy sprawdzić czy dany graf jest spójny\\
+\texttt{---path} liczba ścieżek, początek pierwszej ścieżki (numer węzła) koniec pierwszej ścieżki, początek drugiej ścieżki itd. Oznacza że chcemy znaleźć najkrótsze ścieżki w grafie\\
+
+\subsection{Przykładowe wywołanie
+}\label{header-n281}
+./pong ---output grafprzyklad ---edges random ---rows 10 ---columns 15\\
+program generuje graf i zaspisuje do pliku o nazwie grafprzyklad. Istnienie krawędzi jest losowe - graf nie musi być spójny. Wygenerowany graf będzie miał 10 wierszy i 15 kolumn.
+\section{Komunikaty błędów
+}\label{header-n281}
+
+\begin{itemize}
+\item
+jeżeli podano złe argumenty wywołania pojawia się błąd:\\*
+"incorrect input"
+\item
+jeżeli liczba kolumn jest niedodatnia, pojawia się błąd:\\*
+“incorrect columns number”
+\item
+jeżeli liczba wierszy jest niedodatnia, pojawia się błąd:\\* 
+“incorrect lines number”
+\item
+jeżeli dolny lub górny limit wag krawędzi jest ujemny pojawia się błąd:\\* “incorrect lower limit or incorrect higher limit”
+\item
+jeżli górny limit jest mniejszy od dolnego limitu, pojawia się błąd:\\* 
+“higher limit is too low”
+\item
+jeżeli brakuje istniejącego pliku do odczytu, pojawia się błąd:\\* 
+”can not read file”
+\item
+jeżeli plik do odczytu ma źle sformatowane dane, pojawia się błąd:\\* 
+“incorrect data format inside file”
+\end{itemize}
+
+
+\end{document}
