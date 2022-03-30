@@ -13,9 +13,11 @@ struct Node* reader(char*out1)
 	
 	if (out == NULL) 
 	{
-      fprintf (stderr, "can read from file: %s\n\n",  out1);
+      fprintf (stderr, "can not write in file: %s\n\n",  out1);
       exit (EXIT_FAILURE);
 	}
+	
+	
 	int rows;
 	int columns;
 	int i =0;
@@ -41,13 +43,15 @@ struct Node* reader(char*out1)
 		k=0;
 		sscanf(w,"%i :%lf %i :%lf %i :%lf %i :%lf",&(nconnected[k]),&(nweight[k]), &(nconnected[k+1]),&(nweight[k+1]) ,&(nconnected[k+2]),&(nweight[k+2]), &(nconnected[k+3]),&(nweight[k+3]));
 		k =0;
-			head[p].connected = malloc(sizeof(int *)*5);
-			head[p].weight = malloc(sizeof(double *)*5);
+			head[p].connected = malloc(5*sizeof(int *));
+			head[p].weight = malloc(5*sizeof(double *));
 			memcpy(head[p].connected, nconnected,5*sizeof(int));
 		    memcpy(head[p].weight, nweight,5*sizeof(double));
 		p++;
 	}
 	fclose(out);
+	free(nconnected);
+	free(nweight);
 	return head;
 }
 

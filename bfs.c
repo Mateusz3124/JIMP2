@@ -8,10 +8,10 @@
 stos_t* put_on_stack(stos_t* head, int b){
 	if(head == NULL)
 	{
-		stos_t *tmp = (stos_t*) malloc(sizeof tmp);
-		tmp->node = b;
-		tmp->next = NULL;
-		return tmp;	
+		stos_t *nw = malloc(sizeof *nw);
+		nw->node = b;
+		nw->next = NULL;
+		return nw;	
 	}
 	else{
 	stos_t *tmp= head;                  
@@ -24,29 +24,29 @@ stos_t* put_on_stack(stos_t* head, int b){
 	}
 }
 
-stos_t* stos_inic(int b){
-	stos_t *tmp = (stos_t*) malloc(sizeof tmp);
-	tmp->node = b;
-	tmp->next = NULL;
-
-	return tmp;	
-}
-
 int top_of_stack(stos_t* head){
 	return head->node;
 }
 
 stos_t* delete(stos_t* head){
 	if(head->next != NULL)
-		return head->next;
+	{
+		stos_t* tmp = head;
+		head = head->next;
+		free(tmp);
+		return head;
+	}
 	else
+	{
+		free(head);
 		return NULL;
+	}
 }
 
 
 int bfs(struct Node*head,int k, int w)
 {
-	int *nodes = malloc(w*k*sizeof(int));
+	int *nodes = malloc(w*k* sizeof(int));
 	int number = k*w;
 	int temp =0;
 	int x =0;
@@ -54,8 +54,9 @@ int bfs(struct Node*head,int k, int w)
 	{
 		nodes[i]=-1;
 	}
-	stos_t *stos = stos_inic(0);
-	nodes [0] = 0;
+	stos_t *stos = NULL;
+	stos = put_on_stack(stos, 0);
+	nodes[0]=0;
 	
 	do{ 
 		temp = top_of_stack(stos);
@@ -79,6 +80,7 @@ int bfs(struct Node*head,int k, int w)
 		if(nodes[i]==-1)
 			x++;
 	}
+	free(nodes);
 	if(x == 0)
 		return 0;
 	else

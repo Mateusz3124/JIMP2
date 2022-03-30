@@ -140,13 +140,37 @@ int main  (int argc ,char** argv){
         exit (EXIT_FAILURE);
     }
     if(mode == 0){      //generate
+
         Node *graph = generate(max_weight, min_weight, columns, rows, edges);
         write (columns, rows, graph, output);
+		for(int i =0; i<rows*columns;i++)
+		{
+			free(graph[i].connected);
+			free(graph[i].weight);
+		}
+		free(graph);
         exit (EXIT_SUCCESS);
     }
     else if(mode == 1){     //check-connection
+	
+		FILE *in = fopen(input,"r");
+		if (in == NULL) 
+		{
+			fprintf (stderr, "can not read from file: %s\n\n",  input);
+			exit (EXIT_FAILURE);
+		}
+		if (fscanf(in, "%i %i", &rows, &columns) != 2)
+			fprintf(stderr,"bad data format inside file");
+		fclose(in);
+	
         Node *graph = reader(input);
         int x = bfs(graph, columns, rows);
+		for(int i =0; i<rows*columns;i++)
+		{
+			free(graph[i].connected);
+			free(graph[i].weight);
+		}
+		free(graph);
         if(x == 0){
             printf("Graph is coherent\n");
             exit(EXIT_SUCCESS);
@@ -157,6 +181,12 @@ int main  (int argc ,char** argv){
             exit(EXIT_FAILURE);
         }
     }
+	
+	
+	
+	
+	
+	
     else if(mode == 2){     //path
         printf("Paths to find:\n");
         for (int i=0; i<2*npaths; i+=2){
