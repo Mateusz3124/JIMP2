@@ -132,6 +132,7 @@ int check_options(){
 }
 
 int main  (int argc ,char** argv){
+	srand(time(NULL));
     if(get_options(argc, argv) != 0){
         fprintf(stderr, "incorrect input\n");
         exit (EXIT_FAILURE);

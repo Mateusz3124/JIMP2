@@ -11,7 +11,7 @@ double get_random_number(double min_weight, double max_weight){
 }
 
 int edge_exists(int edge_mode){
-	double existance_chance = 0.1;		// prawdopodobienstwo istnienia krawedzi
+	double existance_chance = 0.9;		// prawdopodobienstwo istnienia krawedzi
 	if(edge_mode == 0){			// wszystkie krawedzie istnieja
 		return 0;
 	}
@@ -22,9 +22,10 @@ int edge_exists(int edge_mode){
 	}
 }
 
+int l =0;
+
 Node* generate(int max_weight, int min_weight, int columns, int rows, int edges){
 	Node* graph = malloc(columns*rows*sizeof *graph);
-	srand(time(NULL));
 	int n = 0; 	// numer rozpatrywanego wierzcholka
 	int p;
 	for(int r=0; r<rows; r++){
@@ -55,12 +56,25 @@ Node* generate(int max_weight, int min_weight, int columns, int rows, int edges)
 		n++;
 		}
 	}
-	if(edges == 1 && bfs(graph, columns, rows)==1)  
+	if (edges == 0 || edges == 2)
+		return graph;
+	
+	if(edges == 1 && bfs(graph, columns, rows)==0)
+	{
+		return graph;
+	}
+	else
 		{
+		printf("tutaj\n");
+		for(int i =0; i<rows*columns;i++)
+		{
+			free(graph[i].connected);
+			free(graph[i].weight);
+		}
 		free(graph);
 		generate(max_weight, min_weight, columns, rows, edges);
 		}
-	return graph;
+		
 }
 
 void write(int columns, int rows, struct Node *graph, char *output){
