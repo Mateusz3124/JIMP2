@@ -5,17 +5,20 @@
 #include "generator.h"
 #include "bfs.h"
 
-double get_random_number(double min_weight, double max_weight){
+double get_random_number(double min_weight, double max_weight)
+{
 	double r = (double)rand() / RAND_MAX;
 	return(min_weight + (max_weight - min_weight)*r);
 }
 
-int edge_exists(int edge_mode){
-	double existance_chance = 0.9;		// prawdopodobienstwo istnienia krawedzi
-	if(edge_mode == 0){			// wszystkie krawedzie istnieja
+int edge_exists(int edge_mode)
+{
+	double existance_chance = 0.9;		
+	if(edge_mode == 0){			
 		return 0;
 	}
-	if(get_random_number(0.0, 1.0) >= (1.0 - existance_chance)){
+	if(get_random_number(0.0, 1.0) >= (1.0 - existance_chance))
+	{
 		return 0;
 	}else{
 		return 1;
@@ -24,32 +27,40 @@ int edge_exists(int edge_mode){
 
 int l =0;
 
-Node* generate(int max_weight, int min_weight, int columns, int rows, int edges){
+Node* generate(int max_weight, int min_weight, int columns, int rows, int edges)
+{
 	Node* graph = malloc(columns*rows*sizeof *graph);
-	int n = 0; 	// numer rozpatrywanego wierzcholka
+	int n = 0; 	
 	int p;
-	for(int r=0; r<rows; r++){
-		for(int c=0; c<columns; c++){
+	for(int r=0; r<rows; r++)
+	{
+		for(int c=0; c<columns; c++)
+		{
 			graph[n].connected = malloc(sizeof(int *)*5);
 			graph[n].weight = malloc(sizeof(int *)*5);
-			for(int i=0; i<5; i++){		//wypelnaimy wszystko -1 bo czemu nie
+			for(int i=0; i<5; i++)
+			{		
 				graph[n].connected[i] = -1;
 				graph[n].weight[i] = -1.0;
 			} 
 			p = 0;
-			if(r != 0 && edge_exists(edges) == 0){ 		// nie na gorze i istnieje krawedz
+			if(r != 0 && edge_exists(edges) == 0)
+			{ 		
 				graph[n].connected[p] = n-columns;
 				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
 			}
-			if(c != 0 && edge_exists(edges) == 0){   // nie po lewej
+			if(c != 0 && edge_exists(edges) == 0)
+			{  
 				graph[n].connected[p] = n-1;
 				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
 			}
-			if(c != columns-1 && edge_exists(edges) == 0){   // nie po prawej
+			if(c != columns-1 && edge_exists(edges) == 0)
+			{   
 				graph[n].connected[p] = n+1;
 				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
 			}
-			if(r != rows-1 && edge_exists(edges) == 0){   // nie na dole
+			if(r != rows-1 && edge_exists(edges) == 0)
+			{   
 				graph[n].connected[p] = n+columns;
 				graph[n].weight[p++] = get_random_number(min_weight, max_weight); 
 			}
@@ -87,7 +98,8 @@ void write(int columns, int rows, struct Node *graph, char *output){
 	fprintf(out, "%d %d\n", rows, columns);
 	for(int n=0; n<rows*columns; n++){
 		for(int i=0; i<4; i++){
-			if(graph[n].connected[i]>=0){ 	// jesli -1 to nie ma polaczenia
+			if(graph[n].connected[i]>=0)
+			{ 	
 				fprintf(out, "%d ", graph[n].connected[i]);
 				fprintf(out, ":%f  ", graph[n].weight[i]);
 			}
