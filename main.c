@@ -7,6 +7,9 @@
 #include "reader.h"
 #include "bfs.h"
 
+#define cgenerate 0
+#define cpath 2
+#define checkconnection 1
 
 int mode = -1; //tryb uruchomienia programu -1 nie wybrano, 0 generate, 1 check_connection, 2 path
 double min_weight = 0.0;
@@ -140,7 +143,7 @@ int main  (int argc ,char** argv){
     if(check_options() != 0){
         exit (EXIT_FAILURE);
     }
-    if(mode == 0){      //generate
+    if(mode == cgenerate){      //generate
 
         Node *graph = generate(max_weight, min_weight, columns, rows, edges);
         write (columns, rows, graph, output);
@@ -152,7 +155,7 @@ int main  (int argc ,char** argv){
 		free(graph);
         exit (EXIT_SUCCESS);
     }
-    else if(mode == 1){     //check-connection
+    else if(mode == checkconnection){     //check-connection
 	
 		FILE *in = fopen(input,"r");
 		if (in == NULL) 
@@ -188,7 +191,7 @@ int main  (int argc ,char** argv){
 	
 	
 	
-    else if(mode == 2){     //path
+    else if(mode == cpath){     //path
         printf("Paths to find:\n");
         for (int i=0; i<2*npaths; i+=2){
             printf("    %d -> %d\n", paths[i], paths[i+1]);
